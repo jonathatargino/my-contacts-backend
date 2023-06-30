@@ -27,5 +27,6 @@ module.exports = {
       "error",
       "always",
     ],
+    "class-methods-use-this": 0,
   },
 };
