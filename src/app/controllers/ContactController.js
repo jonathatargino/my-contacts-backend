@@ -17,8 +17,26 @@ class ContactController {
     return res.json(contact);
   }
 
-  store(req, res) {
+  async store(req, res) {
+    const {
+      name, email, phone, category_id,
+    } = req.body;
 
+    if (!name) {
+      return res.status(400).json({ error: "Name is required" });
+    }
+
+    const contactExists = await ContactRepository.findByEmail(email);
+
+    if (contactExists) {
+      return res.status(400).json({ error: "This e-mail is already been taked" });
+    }
+
+    const contact = await ContactRepository.create({
+      name, email, phone, category_id,
+    });
+
+    return res.json(contact);
   }
 
   update(req, res) {

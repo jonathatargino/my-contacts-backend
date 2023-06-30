@@ -28,5 +28,6 @@ module.exports = {
       "always",
     ],
     "class-methods-use-this": 0,
+    camelcase: 0,
   },
 };
