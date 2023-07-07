@@ -37,7 +37,7 @@ class ContactController {
       name, email, phone, category_id,
     });
 
-    return res.json(contact);
+    return res.status(201).json(contact);
   }
 
   async update(req, res) {
