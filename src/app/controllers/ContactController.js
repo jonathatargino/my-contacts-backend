@@ -31,6 +31,11 @@ class ContactController {
       name, email, phone, category_id,
     } = req.body;
 
+    const isCategoryIdInvalid = !validate(category_id, 4)
+    if (isCategoryIdInvalid) {
+      return res.status(404).json({ error: "Categoria não encontrado" });
+    }
+
     if (!name) {
       return res.status(400).json({ error: "Nome é um campo obrigatório" });
     }
@@ -51,14 +56,19 @@ class ContactController {
   async update(req, res) {
     const { id } = req.params;
 
-    const isIdInvalid = !validate(id, 4)
-    if (isIdInvalid) {
+    const isContactIdInvalid = !validate(id, 4)
+    if (isContactIdInvalid) {
       return res.status(404).json({ error: "Contato não encontrado" });
     }
 
     const {
       name, email, phone, category_id,
     } = req.body;
+
+    const isCategoryIdInvalid = !validate(category_id, 4)
+    if (isCategoryIdInvalid) {
+      return res.status(404).json({ error: "Categoria não encontrado" });
+    }
 
     const contactExists = await ContactRepository.findById(id);
 
