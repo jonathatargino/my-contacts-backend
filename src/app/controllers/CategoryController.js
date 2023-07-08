@@ -14,13 +14,13 @@ class CategoryController {
 
     const isIdInvalid = !validate(id, 4)
     if (isIdInvalid) {
-      return res.status(404).json({ error: "Category not found" });
+      return res.status(404).json({ error: "Categoria não encontrada" });
     }
 
     const category = await CategoryRepository.findById(id);
 
     if (!category) {
-      return res.status(404).json({ error: "Category not found" });
+      return res.status(404).json({ error: "Categoria não encontrada" });
     }
 
     return res.json(category);
@@ -30,7 +30,7 @@ class CategoryController {
     const { name } = req.body;
 
     if (!name) {
-      return res.status(400).json({ error: "Name is required" });
+      return res.status(400).json({ error: "Nome é um campo obrigatório" });
     }
 
     const category = await CategoryRepository.create({ name });
@@ -43,7 +43,7 @@ class CategoryController {
 
     const isIdInvalid = !validate(id, 4)
     if (isIdInvalid) {
-      return res.status(404).json({ error: "Category not found" });
+      return res.status(404).json({ error: "Categoria não encontrada" });
     }
 
     const { name } = req.body;
@@ -51,11 +51,11 @@ class CategoryController {
     const categoryExists = await CategoryRepository.findById(id);
 
     if (!categoryExists) {
-      return res.status(404).json({ error: "Category not found" });
+      return res.status(404).json({ error: "Categoria não encontrada" });
     }
 
     if (!name) {
-      return res.status(400).json({ error: "Name is required" });
+      return res.status(400).json({ error: "Nome é um campo obrigatório" });
     }
 
     const category = await CategoryRepository.update(id, { name });
@@ -66,10 +66,15 @@ class CategoryController {
   async delete(req, res) {
     const { id } = req.params;
 
+    const isIdInvalid = !validate(id, 4)
+    if (isIdInvalid) {
+      return res.status(404).json({ error: "Categoria não encontrada" });
+    }
+
     const category = await CategoryRepository.findById(id);
 
     if (!category) {
-      return res.status(404).json({ error: "Category not found" });
+      return res.status(404).json({ error: "Categoria não encontrada" });
     }
 
     await CategoryRepository.delete(id);
