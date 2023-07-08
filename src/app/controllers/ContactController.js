@@ -70,15 +70,16 @@ class ContactController {
       return res.status(404).json({ error: "Categoria não encontrado" });
     }
 
+    if (!name) {
+      return res.status(400).json({ error: "Nome é um campo obrigatório" });
+    }
+
     const contactExists = await ContactRepository.findById(id);
 
     if (!contactExists) {
       return res.status(404).json({ error: "Contato não encontrado" });
     }
 
-    if (!name) {
-      return res.status(400).json({ error: "Nome é um campo obrigatório" });
-    }
 
     const contactByEmail = await ContactRepository.findByEmail(email);
 

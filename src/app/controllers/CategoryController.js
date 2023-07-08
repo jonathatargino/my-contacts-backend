@@ -47,6 +47,9 @@ class CategoryController {
     }
 
     const { name } = req.body;
+    if (!name) {
+      return res.status(400).json({ error: "Nome é um campo obrigatório" });
+    }
 
     const categoryExists = await CategoryRepository.findById(id);
 
@@ -54,9 +57,6 @@ class CategoryController {
       return res.status(404).json({ error: "Categoria não encontrada" });
     }
 
-    if (!name) {
-      return res.status(400).json({ error: "Nome é um campo obrigatório" });
-    }
 
     const category = await CategoryRepository.update(id, { name });
 
