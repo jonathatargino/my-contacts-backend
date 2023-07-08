@@ -1,4 +1,5 @@
 const CategoryRepository = require("../repositories/CategoryRepository");
+const validate = require('uuid-validate');
 
 class CategoryController {
   async index(req, res) {
@@ -10,6 +11,12 @@ class CategoryController {
 
   async show(req, res) {
     const { id } = req.params;
+
+    const isIdInvalid = !validate(id, 4)
+    if (isIdInvalid) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
     const category = await CategoryRepository.findById(id);
 
     if (!category) {
@@ -33,6 +40,12 @@ class CategoryController {
 
   async update(req, res) {
     const { id } = req.params;
+
+    const isIdInvalid = !validate(id, 4)
+    if (isIdInvalid) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
     const { name } = req.body;
 
     const categoryExists = await CategoryRepository.findById(id);
