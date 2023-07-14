@@ -3,12 +3,26 @@ require("express-async-errors");
 
 const express = require("express");
 const cors = require("cors")
+const passport = require("passport")
+const cookieSession = require("cookie-session")
+const passportSetup = require("./passport")
 const errorHandler = require("./app/middlewares/errorHandler")
 const routes = require("./routes");
 
 const app = express();
 
-app.use(cors({origin: process.env.FRONTEND_URL}))
+app.use(
+  cookieSession({
+    name: "session",
+    keys: ["mycontacts"],
+    maxAge: 24 * 60 * 60 * 100
+  })
+)
+
+app.use(passport.initialize())
+app.use(passport.session())
+
+app.use(cors({origin: process.env.FRONTEND_URL, credentials: true}))
 
 app.use(express.json());
 app.use(routes);
