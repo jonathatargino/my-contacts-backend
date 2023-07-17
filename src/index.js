@@ -16,7 +16,7 @@ app.use(
   cookieSession({
     name: "session",
     keys: ["mycontacts"],
-    maxAge: 24 * 60 * 60 * 100
+    maxAge: 24 * 60 * 60 * 100,
   })
 )
 
@@ -28,9 +28,13 @@ app.use(cors({origin: process.env.FRONTEND_URL, credentials: true}))
 app.use("/auth", authRoutes)
 
 app.use((req, res, next) => {
-  if (!req.user) {
-    return res.status(403).json({error: true, message: "Not Authorized"})
+  if(!req.headers.authorization) {
+    res.status(403).json({
+      error: true,
+      message: "Not authorized action"
+    })
   }
+
 
   next()
 })
