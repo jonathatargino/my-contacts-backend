@@ -17,4 +17,12 @@ router.post("/categories", CategoryController.store);
 router.put("/categories/:id", CategoryController.update);
 router.delete("/categories/:id", CategoryController.delete);
 
+const UserController = require("../app/controllers/UserController")
+
+router.get("/users", UserController.index)
+router.get("/users/:id", UserController.show)
+router.post("/users", UserController.store)
+router.put("/users/:id", UserController.update)
+router.delete("users/:id", UserController.delete)
+
 module.exports = router;
