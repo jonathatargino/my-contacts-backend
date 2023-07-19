@@ -1,15 +1,13 @@
 const { Router } = require("express");
 const passport = require("passport")
+const jwt = require("jsonwebtoken")
 
 const router = Router();
 
 router.get("/login/success", (req, res) => {
   if (req.user){
-    return res.status(200).json({
-      error: false,
-      message: "Successfully",
-      user: req.user
-    })
+    const authToken = jwt.sign(req.user, process.env.TOKEN_SECRET)
+    return res.redirect(`${process.env.FRONTEND_URL}/?authToken=${authToken}`)
   }
 
   res.status(403).json({error: true, message: "Not Authorized"})
@@ -25,7 +23,7 @@ router.get("/login/failed", (req, res) => {
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    successRedirect: `${process.env.FRONTEND_URL}/contacts`,
+    successRedirect: `/auth/login/success`,
     failureRedirect: "login/failed"
   })
 )
