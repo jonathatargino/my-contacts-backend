@@ -6,6 +6,7 @@ const cors = require("cors")
 const passport = require("passport")
 const cookieSession = require("cookie-session")
 const passportSetup = require("./passport")
+const authHandler = require("./app/middlewares/authHandler")
 const errorHandler = require("./app/middlewares/errorHandler")
 const routes = require("./routes");
 const authRoutes = require("./routes/authRoutes")
@@ -27,17 +28,7 @@ app.use(cors({origin: process.env.FRONTEND_URL, credentials: true}))
 
 app.use("/auth", authRoutes)
 
-app.use((req, res, next) => {
-  if(!req.headers.authorization) {
-    res.status(403).json({
-      error: true,
-      message: "Not authorized action"
-    })
-  }
-
-
-  next()
-})
+app.use(authHandler)
 
 app.use(express.json());
 app.use(routes);
