@@ -20,6 +20,8 @@ class UserController {
     if (!user) {
       return res.status(404).json({error: "Usuário não encontrado"})
     }
+
+    return res.json(user)
   }
 
   async store (req, res) {
@@ -39,6 +41,7 @@ class UserController {
     }
 
     const user = await UserRepository.create({name, email})
+    return res.json(user)
   }
 
   async update (req, res) {

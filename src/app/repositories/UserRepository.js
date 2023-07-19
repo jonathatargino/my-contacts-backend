@@ -3,10 +3,12 @@ const db = require("../../database/index")
 class UserRepository {
   async findAll () {
     const rows = await db.query("SELECT * FROM users")
+    return rows
   }
 
   async findById (id) {
     const [row] = await db.query("SELECT * FROM users WHERE id = $1", [id])
+    return row
   }
 
   async findByEmail(email) {
@@ -20,6 +22,8 @@ class UserRepository {
       VALUES($1, $2)
       RETURNING *
     `, [name, email])
+
+    return row
   }
 
   async update(id, {name, email}) {
@@ -29,6 +33,8 @@ class UserRepository {
       WHERE id = $3
       RETURNING *
     `, [name, email, id])
+
+    return row
   }
 
   async delete(id) {
