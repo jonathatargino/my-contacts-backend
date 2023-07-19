@@ -44,6 +44,23 @@ class UserController {
     return res.json(user)
   }
 
+  async storeByLogin ({name, email}) {
+    if (!name) {
+      return res.status(400).json({error: "Nome é um campo obrigatório"})
+    }
+
+    if (!email) {
+      return res.status(400).json({error: "Email é um campo obrigatório"})
+    }
+
+    const userExists = await UserRepository.findByEmail(email)
+    if (userExists) {
+      return
+    }
+
+    const user = await UserRepository.create({name, email})
+  }
+
   async update (req, res) {
     const { id } = req.params
     const { name, email } = req.body
