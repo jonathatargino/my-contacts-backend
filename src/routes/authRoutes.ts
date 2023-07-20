@@ -1,21 +1,23 @@
-const { Router } = require("express");
-const passport = require("passport")
-const jwt = require("jsonwebtoken")
-const UserController = require("../app/controllers/UserController")
+import { Router } from "express"
+import passport from "passport"
+import jwt from "jsonwebtoken"
+import UserController from "../app/controllers/UserController"
 
 const router = Router();
 
 router.get("/login/success", (req, res) => {
+  const user = req.user
+
   if (req.user){
-    const authenticated_user_name = req.user.displayName
-    const authenticated_user_email = req.user.emails[0].value
+    const authenticated_user_name = (user as any).displayName
+    const authenticated_user_email = (user as any).emails[0].value
 
     UserController.storeByLogin({
       email: authenticated_user_email,
       name: authenticated_user_name
     })
 
-    const authToken = jwt.sign(req.user, process.env.TOKEN_SECRET)
+    const authToken = jwt.sign(req.user, process.env.TOKEN_SECRET as string)
     return res.redirect(`${process.env.FRONTEND_URL}/?authToken=${authToken}`)
   }
 
@@ -37,12 +39,15 @@ router.get(
   })
 )
 
-router.get("/google", passport.authenticate("google", ["profile", "email"]))
+router.get("/google", passport.authenticate("google"))
 
-router.get("/logout", (req, res) => {
-  req.logout();
-  res.redirect(process.env.FRONTEND_URL)
+router.get("/logout", (req, res, next) => {
+  req.logout(function (err) {
+    if (err) return next(err)
+  });
+
+  res.redirect(process.env.FRONTEND_URL as string)
 })
 
-module.exports = router;
+export default router;
 

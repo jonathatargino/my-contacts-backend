@@ -7,6 +7,9 @@
     "strict": true,
     "skipLibCheck": true,
     "allowJs": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "typeRoots": ["node_modules/@types", "src/@types"]
   },
   "display": "recommended",
   "include": ["src/**/*.ts"],

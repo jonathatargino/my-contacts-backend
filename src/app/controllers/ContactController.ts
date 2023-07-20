@@ -1,25 +1,34 @@
-const ContactRepository = require("../repositories/ContactRepository");
-const validate = require('uuid-validate');
+import { Request, Response } from "express";
+
+import ContactRepository from "../repositories/ContactRepository"
+import validate from "uuid-validate"
 
 class ContactController {
-  async index(req, res) {
+  async index(req: Request, res: Response) {
     const { order } = req.query;
-    const {auth_user} = req
+    const { user } = res.locals
 
-    const contacts = await ContactRepository.findAll(order, auth_user.id);
+    const contacts = await ContactRepository.findAll({
+      order: order as "asc" | "desc",
+      user_id: user.id
+    });
+
     res.json(contacts);
   }
 
-  async show(req, res) {
+  async show(req: Request, res: Response) {
     const { id } = req.params;
-    const {auth_user} = req
+    const { user } = res.locals
 
     const isIdInvalid = !validate(id, 4)
     if (isIdInvalid) {
       return res.status(404).json({ error: "Contato não encontrado" });
     }
 
-    const contact = await ContactRepository.findById(id, auth_user.id);
+    const contact = await ContactRepository.findById({
+      id,
+      user_id: user.id
+    });
 
 
     if (!contact) {
@@ -29,11 +38,11 @@ class ContactController {
     return res.json(contact);
   }
 
-  async store(req, res) {
+  async store(req: Request, res: Response) {
     const {
       name, email, phone, category_id,
     } = req.body;
-    const {auth_user} = req
+    const { user } = res.locals
 
     const isCategoryIdInvalid = !validate(category_id, 4)
     if (isCategoryIdInvalid) {
@@ -44,22 +53,29 @@ class ContactController {
       return res.status(400).json({ error: "Nome é um campo obrigatório" });
     }
 
-    const contactExists = await ContactRepository.findByEmail(email, auth_user.id);
+    const contactExists = await ContactRepository.findByEmail({
+      email,
+      user_id: user.id
+    });
 
     if (contactExists) {
       return res.status(400).json({ error: "Esse e-mail ja está em uso" });
     }
 
     const contact = await ContactRepository.create({
-      name, email, phone, category_id, user_id: auth_user.id
+      name,
+      email,
+      phone,
+      category_id,
+      user_id: user.id
     });
 
     return res.status(201).json(contact);
   }
 
-  async update(req, res) {
+  async update(req: Request, res: Response) {
     const { id } = req.params;
-    const {auth_user} = req
+    const { user } = res.locals
 
     const isContactIdInvalid = !validate(id, 4)
     if (isContactIdInvalid) {
@@ -80,44 +96,64 @@ class ContactController {
       return res.status(400).json({ error: "Nome é um campo obrigatório" });
     }
 
-    const contactExists = await ContactRepository.findById(id, auth_user.id);
+    const contactExists = await ContactRepository.findById({
+      id,
+      user_id: user.id
+    });
 
     if (!contactExists) {
       return res.status(404).json({ error: "Contato não encontrado" });
     }
 
 
-    const contactByEmail = await ContactRepository.findByEmail(email, auth_user.id);
+    const contactByEmail = await ContactRepository.findByEmail({
+      email,
+      user_id: user.id
+    });
 
     if (contactByEmail && contactByEmail.id !== id) {
       return res.status(400).json({ error: "Esse e-mail ja está em uso" });
     }
 
-    const updatedContact = await ContactRepository.update(id, auth_user.id, {
-      name, email, phone, category_id,
+    const updatedContact = await ContactRepository.update({
+      id,
+      user_id: user.id,
+      body: {
+        name,
+        email,
+        phone,
+        category_id
+      }
     });
 
     return res.json(updatedContact);
   }
 
-  async delete(req, res) {
+  async delete(req: Request, res: Response) {
     const { id } = req.params;
-    const {auth_user} = req
+    const { user } = res.locals
 
     const isIdInvalid = !validate(id, 4)
     if (isIdInvalid) {
       return res.status(404).json({ error: "Contato não encontrado" });
     }
 
-    const contact = await ContactRepository.findById(id, auth_user.id);
+    const contact = await ContactRepository.findById({
+      id,
+      user_id: user.id
+    });
 
     if (!contact) {
       return res.status(404).json({ error: "Contato não encontrado" });
     }
 
-    await ContactRepository.delete(id, auth_user.id);
+    await ContactRepository.delete({
+      id,
+      user_id: user.id
+    });
+
     return res.sendStatus(204);
   }
 }
 
-module.exports = new ContactController();
+export default new ContactController();

@@ -1,13 +1,14 @@
-const UserRepository = require("../repositories/UserRepository")
-const validate = require('uuid-validate');
+import { Request, Response } from "express"
+import UserRepository from "../repositories/UserRepository"
+import validate from "uuid-validate"
 
 class UserController {
-  async index (req, res) {
+  async index (req: Request, res: Response) {
     const users = await UserRepository.findAll()
     return res.json(users)
   }
 
-  async show (req, res) {
+  async show (req: Request, res: Response) {
     const { id } = req.params
 
     const isIdInvalid = !validate(id, 4)
@@ -15,7 +16,7 @@ class UserController {
       return res.status(404).json({error: "Usuário não encontrado"})
     }
 
-    const user = await UserRepository.findById(id)
+    const user = await UserRepository.findById({ id })
 
     if (!user) {
       return res.status(404).json({error: "Usuário não encontrado"})
@@ -24,7 +25,7 @@ class UserController {
     return res.json(user)
   }
 
-  async store (req, res) {
+  async store (req: Request, res: Response) {
     const {name, email} = req.body
 
     if (!name) {
@@ -35,33 +36,33 @@ class UserController {
       return res.status(400).json({error: "Email é um campo obrigatório"})
     }
 
-    const userExists = await UserRepository.findByEmail(email)
+    const userExists = await UserRepository.findByEmail({ email })
     if (userExists) {
       return res.status(400).json({ error: "Esse e-mail ja está em uso" });
     }
 
-    const user = await UserRepository.create({name, email})
+    const user = await UserRepository.create({ name, email })
     return res.json(user)
   }
 
-  async storeByLogin ({name, email}) {
+  async storeByLogin (body: { name: string, email: string }) {
+    const { name, email } = body
+
     if (!name) {
-      return res.status(400).json({error: "Nome é um campo obrigatório"})
+      throw new Error("Nome é um campo obrigatório")
     }
 
     if (!email) {
-      return res.status(400).json({error: "Email é um campo obrigatório"})
+      throw new Error("Email é um campo obrigatório")
     }
 
-    const userExists = await UserRepository.findByEmail(email)
-    if (userExists) {
-      return
-    }
+    const userExists = await UserRepository.findByEmail({ email })
+    if (userExists) return
 
-    const user = await UserRepository.create({name, email})
+    const user = await UserRepository.create({ name, email })
   }
 
-  async update (req, res) {
+  async update (req: Request, res: Response) {
     const { id } = req.params
     const { name, email } = req.body
 
@@ -78,7 +79,7 @@ class UserController {
       return res.status(400).json({error: "Email é um campo obrigatório"})
     }
 
-    const userExists = await UserRepository.findById(id)
+    const userExists = await UserRepository.findById({ id })
 
     if (!userExists) {
       return res.status(400).json({error: "Usuário não encontrado"})
@@ -90,13 +91,13 @@ class UserController {
       return res.status(400).json({ error: "Esse e-mail ja está em uso" });
     }
 
-    const updatedUser = await UserRepository.update(id, { name, email })
+    const updatedUser = await UserRepository.update({ id, body: { name, email }})
 
     return res.json(updatedUser)
 
   }
 
-  async delete (req, res) {
+  async delete (req: Request, res: Response) {
     const { id } = req.params
 
     const isIdInvalid = !validate(id, 4)
@@ -104,16 +105,16 @@ class UserController {
       return res.status(404).json({error: "Usuário não encontrado"})
     }
 
-    const user = await UserRepository.findById(id)
+    const user = await UserRepository.findById({ id })
 
     if (!user) {
       return res.status(404).json({error: "Usuário não encontrado"})
     }
 
-    await UserRepository.delete(id)
+    await UserRepository.delete({ id })
 
     return res.sendStatus(204)
   }
 }
 
-module.exports = new UserController()
+export default new UserController()
