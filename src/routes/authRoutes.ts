@@ -1,9 +1,25 @@
 import { Router } from "express"
-import passport from "passport"
+import passport, { authorize } from "passport"
 import jwt from "jsonwebtoken"
 import UserController from "../app/controllers/UserController"
 
 const router = Router();
+
+router.get("/login/token_validation", (req, res) => {
+  const authToken = req.headers.authorization
+
+  try {
+    jwt.verify(authToken as string, process.env.TOKEN_SECRET as string)
+  } catch {
+    return res.json({
+      authorized: false
+    })
+  }
+
+  return res.json({
+    authorized: true
+  })
+})
 
 router.get("/login/success", (req, res) => {
   const user = req.user
@@ -46,7 +62,7 @@ router.get("/logout", (req, res, next) => {
     if (err) return next(err)
   });
 
-  res.redirect(process.env.FRONTEND_URL as string)
+  res.sendStatus(200)
 })
 
 export default router;
